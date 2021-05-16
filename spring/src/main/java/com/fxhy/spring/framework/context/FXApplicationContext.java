@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class FXApplicationContext {
 
@@ -36,6 +37,10 @@ public class FXApplicationContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Properties getConfig(){
+        return reader.getContextConfig();
     }
 
     private void doRegistBeanDefinition(List<FXBeanDefinition> beanDefinitions) throws Exception {
@@ -97,9 +102,9 @@ public class FXApplicationContext {
 
                 //如果用户没有自定义的beanName，就默认根据类型注入
                 String autowireBeanName = autowired.value().trim();
-                if("".equals(beanName)){
+                if("".equals(autowireBeanName)){
                     //field.getType().getName() 获取字段的类型
-                    beanName = field.getType().getName();
+                    autowireBeanName = field.getType().getName();
                 }
 
                 //暴力访问

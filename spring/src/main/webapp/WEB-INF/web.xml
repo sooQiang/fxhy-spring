@@ -7,7 +7,7 @@
 	<display-name>Gupao Web Application</display-name>
 	<servlet>
 		<servlet-name>gpmvc</servlet-name>
-		<servlet-class>com.fxhy.spring.framework.beans.webmvc.servlet.FXDispatchServlet</servlet-class>
+		<servlet-class>com.fxhy.spring.framework.webmvc.servlet.FXDispatchServlet</servlet-class>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>classpath:application.properties</param-value>

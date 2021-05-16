@@ -17,6 +17,14 @@ public class FXBeanDefinitionReader {
     //享元模式，缓存
     private List<String> registryBeanClasses = new ArrayList<String>();
 
+    public Properties getContextConfig() {
+        return contextConfig;
+    }
+
+    public void setContextConfig(Properties contextConfig) {
+        this.contextConfig = contextConfig;
+    }
+
     public FXBeanDefinitionReader(String ... configLocations) {
         doLoadConfig(configLocations[0]);
 
@@ -31,7 +39,7 @@ public class FXBeanDefinitionReader {
         for (String className : registryBeanClasses) {
             Class<?> beanClass = null;
                 beanClass = Class.forName(className);
-
+            if(beanClass.isInterface()){continue;}
             //保存类对应的className(全类名)
             //还有beanName
             //1.默认是类名首字母小写
