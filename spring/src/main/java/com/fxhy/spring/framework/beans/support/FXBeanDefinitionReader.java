@@ -1,7 +1,6 @@
 package com.fxhy.spring.framework.beans.support;
 
 import com.fxhy.spring.framework.beans.config.FXBeanDefinition;
-import com.fxhy.spring.framework.context.FXApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,10 +22,11 @@ public class FXBeanDefinitionReader {
 
         //扫描配置文件中配置的类
         doScanner(contextConfig.getProperty("scanPackage"));
+
     }
 
     public List<FXBeanDefinition> loadBeanDefinitions() {
-        List<FXBeanDefinition> result = new ArrayList<>();
+        List<FXBeanDefinition> result = new ArrayList<FXBeanDefinition>();
         try {
         for (String className : registryBeanClasses) {
             Class<?> beanClass = null;
@@ -37,6 +37,9 @@ public class FXBeanDefinitionReader {
             //1.默认是类名首字母小写
             result.add(doCreateBeanDefinition(toLowerFirstCase(beanClass.getSimpleName()),beanClass.getName()));
             //2.自定义
+//            if(beanClass.isAnnotationPresent(FXService.class)&&beanClass.getAnnotation(FXService.class).value()!=""){
+//                result.add(doCreateBeanDefinition(beanClass.getAnnotation(FXService.class).value(),beanClass.getName()));
+//            }
             //3.接口注入
             for (Class<?> i : beanClass.getInterfaces()) {
                 result.add(doCreateBeanDefinition(i.getName(),beanClass.getName()));
@@ -52,8 +55,9 @@ public class FXBeanDefinitionReader {
 
     private FXBeanDefinition doCreateBeanDefinition(String beanName,String beanClassName){
         FXBeanDefinition beanDefinition = new FXBeanDefinition();
-        beanDefinition.setBeanClassName(beanClassName);
         beanDefinition.setFactoryBeanName(beanName);
+        beanDefinition.setBeanClassName(beanClassName);
+
         return beanDefinition;
     }
 

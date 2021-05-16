@@ -30,13 +30,21 @@ public class FXApplicationContext {
         List<FXBeanDefinition> beanDefinitions = reader.loadBeanDefinitions();
 
         //3.缓存beanDefinition
-
-            doRegistBeanDefinition(beanDefinitions);
-
+        doRegistBeanDefinition(beanDefinitions);
 
         doAutowrited();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void doRegistBeanDefinition(List<FXBeanDefinition> beanDefinitions) throws Exception {
+        for (FXBeanDefinition beanDefinition : beanDefinitions) {
+            if(this.beanDefinitionMap.containsKey(beanDefinition.getFactoryBeanName())){
+                throw new Exception("The "+beanDefinition.getFactoryBeanName()+" is exists");
+            }
+            beanDefinitionMap.put(beanDefinition.getFactoryBeanName(),beanDefinition);
+            beanDefinitionMap.put(beanDefinition.getBeanClassName(),beanDefinition);
         }
     }
 
@@ -46,16 +54,6 @@ public class FXApplicationContext {
             String beanName = beanDefinitionEntry.getKey();
             getBean(beanName);
 
-        }
-    }
-
-    private void doRegistBeanDefinition(List<FXBeanDefinition> beanDefinitions) throws Exception {
-        for (FXBeanDefinition beanDefinition : beanDefinitions) {
-            if(beanDefinitionMap.containsKey(beanDefinition.getBeanClassName())||beanDefinitionMap.containsKey(beanDefinition.getFactoryBeanName())){
-                throw new Exception("The"+beanDefinition.getBeanClassName()+"|"+beanDefinition.getFactoryBeanName()+"is exists");
-            }
-            beanDefinitionMap.put(beanDefinition.getFactoryBeanName(),beanDefinition);
-            beanDefinitionMap.put(beanDefinition.getBeanClassName(),beanDefinition);
         }
     }
 
@@ -75,7 +73,7 @@ public class FXApplicationContext {
     }
 
     private void populateBean(String beanName, FXBeanDefinition beanDefinition, FXBeanWrapper beanWrapper) {
-        //可能设计到循环依赖
+        //可能涉及到循环依赖
         //A{ B b}
         //B{ A a}
         //用两个缓存，循环两次
@@ -129,10 +127,15 @@ public class FXApplicationContext {
         String className = beanDefinition.getBeanClassName();
 
         try {
-            Class<?> clazz = Class.forName(className);
+            if(this.factoryBeanObjectCache.containsKey(beanName)){
+                return this.factoryBeanObjectCache.get(beanName);
+            }else {
 
-            instance = clazz.newInstance();
-            this.factoryBeanObjectCache.put(beanName,instance);
+                Class<?> clazz = Class.forName(className);
+
+                instance = clazz.newInstance();
+                this.factoryBeanObjectCache.put(beanName, instance);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,5 +145,13 @@ public class FXApplicationContext {
 
     public Object getBean(Class beanClass){
         return getBean(beanClass.getName());
+    }
+
+    public int getBeanDefinitionCount() {
+        return this.beanDefinitionMap.size();
+    }
+
+    public String[] getBeanDefinitionNames() {
+        return beanDefinitionMap.keySet().toArray(new String[beanDefinitionMap.size()]);
     }
 }
